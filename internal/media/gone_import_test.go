@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/maxghenis/openmessage/internal/bridge"
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 )
 
@@ -268,6 +269,7 @@ func TestImportRejectsMismatchesWithoutStoringABlob(t *testing.T) {
 // the size is undeclared or matches, the served bytes then equal the
 // imported ones, and a second import of the same bytes is a no-op success.
 func TestImportRoundTripProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(seed int64) bool {
 		rng := rand.New(rand.NewSource(seed))
 		env := newMediaTestEnvironment(t)

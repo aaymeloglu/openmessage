@@ -18,6 +18,8 @@ import (
 	"strings"
 	"testing"
 	"testing/quick"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 func TestInsertHistoricalMessageInsertsNewRowWithAttachments(t *testing.T) {
@@ -413,6 +415,7 @@ func (hinsSequence) Generate(r *rand.Rand, _ int) reflect.Value {
 // final rows (every column) and attachments are exactly those of the inserting
 // calls, so no later call ever changes a stored row.
 func TestInsertHistoricalMessageFirstWriterWinsProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	clock := newMessageTestClock(messageTestTimeMS)
 	store, repository := openMessageTestRepository(t, clock.Now)
 	seedMessageProjectionGraph(t, store)

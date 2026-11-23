@@ -13,6 +13,7 @@ import (
 	"testing/quick"
 	"time"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 )
 
@@ -440,6 +441,7 @@ func seedRepairDamage(t *testing.T, fixture repairMergeFixture, scenario repairD
 //     content is on its survivor and each reactor's state still follows the
 //     original snapshots of every copy either repair merged.
 func TestGoogleIDSpaceRepairInvariantsProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	coverage := map[string]int{}
 	ctx := context.Background()
 	fixture := newRepairMergeFixture(t)

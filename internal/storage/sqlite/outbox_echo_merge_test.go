@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/maxghenis/openmessage/internal/bridge"
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 const (
@@ -740,6 +741,7 @@ func echoMergeModel(before echoMergeSnapshot, duplicateID, survivorID string, no
 // the repoint. TestOutboxRepointEchoMergeConvergesWithOneMessageProperty
 // checks the model's reaction rules against the public writers.
 func TestOutboxRepointEchoMergeMatchesModelProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	coverage := map[string]int{}
 	clock := newOutboxTestClock(outboxTestTimeMS)
 	store, repository := openOutboxTestRepository(t, clock.Now)
@@ -1297,6 +1299,7 @@ func (echoMergeWriteScenario) Generate(r *rand.Rand, _ int) reflect.Value {
 // reaction rules against ReplaceEmbeddedReactions and ApplyReaction rather
 // than against a restatement of the rules.
 func TestOutboxRepointEchoMergeConvergesWithOneMessageProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	coverage := map[string]int{}
 	clock := newOutboxTestClock(outboxTestTimeMS)
 	store, repository := openOutboxTestRepository(t, clock.Now)

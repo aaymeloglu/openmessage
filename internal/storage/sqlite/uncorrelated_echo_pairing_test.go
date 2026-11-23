@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"testing"
 	"testing/quick"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // TestPairEchoesFindsEveryTrueEchoProperty generates sends at least 2 s
@@ -21,6 +23,7 @@ import (
 // texts go out a second apart and the first one's echo never arrives, the
 // lone echo fits either send. Either answer shows the same two messages.
 func TestPairEchoesFindsEveryTrueEchoProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	check := func(seed int64) bool {
 		r := rand.New(rand.NewSource(seed))
 		var intents []echoIntent

@@ -12,6 +12,7 @@ import (
 	"testing/quick"
 	"time"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 	"github.com/maxghenis/openmessage/internal/v2keys"
 )
@@ -76,6 +77,7 @@ func TestSignalDecoderProjectsAttachmentErrorsAndDeclaredSize(t *testing.T) {
 // for any ids and causes, reaches exactly the attachments it names, and the
 // frame stays valid JSON.
 func TestSignalFrameAttachmentErrorsRoundTripProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(seed int64) bool {
 		rng := rand.New(rand.NewSource(seed))
 		count := 1 + rng.Intn(4)

@@ -20,6 +20,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/maxghenis/openmessage/internal/db"
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 type ingressObserverOutcome string
@@ -329,6 +330,7 @@ func legacyTakesFromHistory(history []legacyDelivery, i int) bool {
 // agrees with the reference model and with the history rule on every
 // delivery, and holds no more records than the model.
 func TestLegacyTakesDeliveryMatchesItsModel(t *testing.T) {
+	racetest.SkipSequential(t)
 	type step struct {
 		Key       uint8
 		Committed bool

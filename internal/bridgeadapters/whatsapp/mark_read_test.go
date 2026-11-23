@@ -14,6 +14,7 @@ import (
 	"go.mau.fi/whatsmeow"
 
 	"github.com/maxghenis/openmessage/internal/bridge"
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/whatsapplive"
 )
 
@@ -372,6 +373,7 @@ func TestMarkReadSendsNoFurtherReceiptAfterItsContextEnds(t *testing.T) {
 // order each sender first appears, and together they hold every message ID
 // exactly once, in request order within a sender.
 func TestReadReceiptBatchesProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	senders := []string{"", "+15557654321", "98765432109876@lid", "+15550000000"}
 	property := func(picks []uint8) bool {
 		messages := make([]bridge.MessageRef, len(picks))

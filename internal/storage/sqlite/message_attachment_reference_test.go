@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"testing"
 	"testing/quick"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // Google named Michaela's image 89144 on 2026-10-18 and, in the same batch,
@@ -80,6 +82,7 @@ func TestRecordInboundAttachmentKeepsTheReferenceWhenAnUpdateNamesNone(t *testin
 // MIME type; with no reference only if none did, and then the last update's
 // MIME type.
 func TestRecordInboundAttachmentReferenceIsTheLastNamedUpdate(t *testing.T) {
+	racetest.SkipSequential(t)
 	clock := newMessageTestClock(messageAttachmentTestTimeMS)
 	store, repository := openMessageAttachmentTestRepository(t, clock.Now)
 	refFor := func(id string, update int) []byte {

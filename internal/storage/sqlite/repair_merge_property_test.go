@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"testing/quick"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // Property tests for ApplyRepairPlan's move and delete steps against a
@@ -421,6 +423,7 @@ func repairPlanModel(before repairPlanState, steps []RepairStep, nowMS int64, co
 // conserved, every intent's target is in the intent's own conversation, and
 // every open send still has its local message in its own conversation.
 func TestApplyRepairPlanMatchesModelProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	coverage := map[string]int{}
 	clock := newOutboxTestClock(outboxTestTimeMS)
 	store, repository := openOutboxTestRepository(t, clock.Now)
@@ -739,6 +742,7 @@ func (repairSnapshotScenario) Generate(r *rand.Rand, _ int) reflect.Value {
 // it written later at F. The expectation is computed from the original rows,
 // not by replaying merges.
 func TestApplyRepairPlanReactionMergeIsOrderIndependentProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	coverage := map[string]int{}
 	store, _ := openOutboxTestRepository(t, newOutboxTestClock(outboxTestTimeMS).Now)
 	seedMessageIdentity(t, store, "identity-a", "account-a")

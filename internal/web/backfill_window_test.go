@@ -15,6 +15,8 @@ import (
 	"testing"
 	"testing/quick"
 	"time"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // backfillWindowNow is the fixed clock for parseBackfillSince tests. It is a
@@ -767,6 +769,7 @@ func (backfillWindowValidInstant) Generate(r *rand.Rand, _ int) reflect.Value {
 // Round trip: every accepted instant, in each accepted encoding, parses back to
 // exactly that instant with windowed=true.
 func TestParseBackfillSincePropertyRoundTrip(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c backfillWindowValidInstant) bool {
 		instant := time.UnixMilli(c.MS)
 		bodies := map[string]time.Time{
@@ -834,6 +837,7 @@ func (backfillWindowRejectedMS) Generate(r *rand.Rand, _ int) reflect.Value {
 // Bounds: a start in the future or at/before the epoch is always an error, in
 // both millisecond encodings and RFC 3339.
 func TestParseBackfillSincePropertyRejectsOutOfRange(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c backfillWindowRejectedMS) bool {
 		bodies := []string{
 			fmt.Sprintf(`{"since":%d}`, c.MS),
@@ -928,6 +932,7 @@ func (backfillWindowBody) Generate(r *rand.Rand, _ int) reflect.Value {
 // window is always in (epoch, now]; no window and no error means zero since;
 // and the result is deterministic.
 func TestParseBackfillSincePropertyContract(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c backfillWindowBody) bool {
 		got, windowed, err := parseBackfillSince(backfillWindowRequest(c.Body), backfillWindowNow)
 		switch {
@@ -979,6 +984,7 @@ func (backfillWindowTypoBody) Generate(r *rand.Rand, _ int) reflect.Value {
 // any casing) is an error, so a typo can never become a deep backfill (no
 // window, no error) or a window from a value the client did not mean.
 func TestParseBackfillSincePropertyTypoFailsClosed(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c backfillWindowTypoBody) bool {
 		_, windowed, err := parseBackfillSince(backfillWindowRequest(c.Body), backfillWindowNow)
 		if err == nil || windowed {

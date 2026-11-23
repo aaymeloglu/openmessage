@@ -9,6 +9,7 @@ import (
 	"testing"
 	"testing/quick"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/whatsapplid"
 )
 
@@ -383,6 +384,7 @@ func readLIDPropertyState(h *lidRepairHarness) lidPropertyState {
 }
 
 func TestLIDRepairProperties(t *testing.T) {
+	racetest.SkipSequential(t)
 	// coverage counts what the scenarios exercised, so a generator that stops
 	// reaching a case shows up in -v output.
 	coverage := map[string]int{}

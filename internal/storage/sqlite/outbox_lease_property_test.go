@@ -15,6 +15,8 @@ import (
 	"testing"
 	"testing/quick"
 	"time"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // leaseRowFault says how the writes to one row fail in a generated history.
@@ -163,6 +165,7 @@ func (leaseDueScript) Generate(r *rand.Rand, _ int) reflect.Value {
 // The clock moves only forward here, so the delays double exactly; the
 // dispatcher's TestLeaseFailuresNeverHoldOtherSends steps it back too.
 func TestLeaseDueBatchInvariantsHoldForAnyDueSetAndFaults(t *testing.T) {
+	racetest.SkipSequential(t)
 	dir := t.TempDir()
 	property := func(script leaseDueScript) bool {
 		if err := runLeaseDueScript(t, dir, script); err != nil {

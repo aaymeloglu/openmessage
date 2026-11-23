@@ -11,6 +11,8 @@ import (
 	"testing"
 	"testing/quick"
 	"time"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // repairStep is what one credential-repair attempt does in a scripted episode.
@@ -386,6 +388,7 @@ func TestSupervisorRepairEpisodeProperties(t *testing.T) {
 // under the floor or over max(MaxBackoff, floor), and the window it draws
 // from doubles per consecutive failure.
 func TestSupervisorRepairRetryDelayBounds(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(minSeconds, maxExtra, floorSeconds uint16, failures uint8, draw int64) bool {
 		minimum := time.Duration(minSeconds%600+1) * time.Second
 		policy := supervisorTestPolicy()

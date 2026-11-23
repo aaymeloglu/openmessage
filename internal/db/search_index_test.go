@@ -8,6 +8,8 @@ import (
 	"testing"
 	"testing/quick"
 	"time"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // searchIndexEntries returns every (message_id, body) pair the search index
@@ -151,6 +153,7 @@ func (indexCase) Generate(r *rand.Rand, _ int) reflect.Value {
 // stored body. Re-saving a message unchanged leaves the index untouched, and
 // no Signal duplicate survives a cleanup or a reopen.
 func TestSearchIndexMatchesMessagesOverRandomWrites(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c indexCase) bool {
 		path := filepath.Join(t.TempDir(), "messages.db")
 		store, err := New(path)
@@ -289,6 +292,7 @@ func (signalDuplicateCase) Generate(r *rand.Rand, _ int) reflect.Value {
 // SignalDuplicateWouldBeDropped says a new Signal message will be dropped if
 // and only if the store-open cleanup deletes it once it is stored.
 func TestSignalDuplicateWouldBeDroppedAgreesWithTheCleanup(t *testing.T) {
+	racetest.SkipSequential(t)
 	// Every case shares one store and starts by emptying it: opening a store
 	// runs the whole migration, which costs far more than a case.
 	store := newTestStore(t)

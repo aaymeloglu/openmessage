@@ -14,6 +14,7 @@ import (
 	"go.mau.fi/mautrix-gmessages/pkg/libgm/gmproto"
 
 	"github.com/maxghenis/openmessage/internal/bridge"
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 	"github.com/maxghenis/openmessage/internal/v2keys"
 )
@@ -261,6 +262,7 @@ func stOracle(c stCase) SendTargetCheck {
 //     cover it.
 //   - S4: entries v2keys cannot key never change the verdict.
 func TestCheckSendTargetPropertiesHold(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(seed int64) bool {
 		rng := rand.New(rand.NewSource(seed))
 		c := stGenerate(rng, true)
@@ -332,6 +334,7 @@ func TestCheckSendTargetPropertiesHold(t *testing.T) {
 // this branch fails the snapshot on them (#207 changes that), while the send
 // check ignores them (S4).
 func TestCheckSendTargetAgreesWithHistoryStaleBindingCheck(t *testing.T) {
+	racetest.SkipSequential(t)
 	store, worker := stOpenWorker(t)
 	nowMS := time.Date(2026, 11, 3, 12, 0, 0, 0, time.UTC).UnixMilli()
 	compared, contradicted := 0, 0

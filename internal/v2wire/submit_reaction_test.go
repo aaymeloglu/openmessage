@@ -12,6 +12,7 @@ import (
 
 	"github.com/maxghenis/openmessage/internal/bridge"
 	"github.com/maxghenis/openmessage/internal/messaging"
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 )
 
@@ -191,6 +192,7 @@ func (reactionAddress) Generate(r *rand.Rand, _ int) reflect.Value {
 // or by remote ID, whitespace aside), and a queued reaction always sits under
 // the target's account and conversation. A refused one queues nothing.
 func TestSubmitReactionV2QueuesOnlyInTheTargetsConversation(t *testing.T) {
+	racetest.SkipSequential(t)
 	f := newReactionSubmitFixture(t)
 	// The acceptable keys, written out per conversation rather than derived
 	// with the code under test.

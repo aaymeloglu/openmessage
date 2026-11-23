@@ -23,6 +23,7 @@ import (
 
 	"github.com/maxghenis/openmessage/internal/bridge"
 	"github.com/maxghenis/openmessage/internal/ingest"
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 const (
@@ -846,6 +847,7 @@ func (hdecHistoryCase) Generate(r *rand.Rand, _ int) reflect.Value {
 // equivalent live frame decodes to, preceded by one conversation event iff a
 // snapshot of the message's own thread was supplied.
 func TestHistoryRecordDecodeMatchesLiveProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	t.Parallel()
 
 	// Class counts guard against a vacuous run: each interesting shape must be

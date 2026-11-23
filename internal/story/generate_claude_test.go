@@ -9,6 +9,7 @@ import (
 	"testing/quick"
 
 	"github.com/maxghenis/openmessage/internal/db"
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 const testStoryJSON = `{"title":"T","summary":"S","chapters":[{"title":"C1","content":"body","period":"2023","quotes":[{"sender":"Alice","text":"hi","timestamp":"2023-01-01"}]}]}`
@@ -234,6 +235,7 @@ func TestGenerateFallsBackToLocalStoryOnRefusal(t *testing.T) {
 // reply, text() returns exactly the text blocks' text, in order; it errors
 // only when that is empty. A refusal or max_tokens stop always errors.
 func TestClaudeMessageTextProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	blockTypes := []string{"text", "thinking", "fallback"}
 	stopReasons := []string{"end_turn", "stop_sequence", "refusal", "max_tokens"}
 

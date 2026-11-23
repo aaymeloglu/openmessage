@@ -9,6 +9,7 @@ import (
 
 	"go.mau.fi/whatsmeow/types"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/v2keys"
 	"github.com/maxghenis/openmessage/internal/whatsapplid"
 	"github.com/maxghenis/openmessage/internal/whatsapplive"
@@ -35,6 +36,7 @@ func (differentialJID) Generate(r *rand.Rand, _ int) reflect.Value {
 }
 
 func TestWhatsAppPersonIdentityAgreesAcrossIngestPaths(t *testing.T) {
+	racetest.SkipSequential(t)
 	key := func(raw string) v2keys.Identity {
 		identity, err := v2keys.IdentityKey("whatsapp-primary", "whatsapp", raw)
 		if err != nil {

@@ -10,6 +10,7 @@ import (
 	"testing/quick"
 
 	"github.com/maxghenis/openmessage/internal/db"
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 )
 
@@ -31,6 +32,7 @@ func (statsCase) Generate(r *rand.Rand, _ int) reflect.Value {
 //   - MessageCount, ConversationCount and LatestTimestamp agree with the same
 //     sums and maxima, per platform and in total.
 func TestStatsMatchReferenceAggregatesProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	// "\t" passes the accounts.bridge_key CHECK (SQLite's trim strips only
 	// spaces) but strings.TrimSpace blanks it, so it is the "unknown" platform.
 	bridges := []string{"google_messages", "google_messages", "signal_cli", "whatsmeow", "mystery_bridge", "\t"}

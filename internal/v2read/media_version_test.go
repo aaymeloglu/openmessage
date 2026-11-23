@@ -8,6 +8,7 @@ import (
 	"testing/quick"
 	"time"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 )
 
@@ -78,6 +79,7 @@ func TestSourceMediaVersionChangesWhenTheMediaIsNamedAndNotWhenItDownloads(t *te
 // on the trimmed remote ID alone, is empty exactly when that is, is otherwise
 // 12 lowercase hex digits, and tells different IDs apart.
 func TestAttachmentMediaVersionProperties(t *testing.T) {
+	racetest.SkipSequential(t)
 	hex12 := regexp.MustCompile(`^[0-9a-f]{12}$`)
 	versionOf := func(remoteID string) string {
 		return attachmentMediaVersion(sqlite.MessageAttachment{RemoteID: remoteID})

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/maxghenis/openmessage/internal/bridge"
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 const confirmReactionTimeMS int64 = 1_780_000_000_000
@@ -329,6 +330,7 @@ func storedReactionsFor(t *testing.T, store *Store, messageID string) []storedRe
 // reported each of them instead, and a reaction that was not delivered
 // (rejected, left uncertain, or put back for retry) leaves no row at all.
 func TestConfirmedOwnReactionIsStoredAsItsEchoWouldBe(t *testing.T) {
+	racetest.SkipSequential(t)
 	// Two stores serve every case; each case gets a message of its own in
 	// both, because opening a store costs far more than a case does.
 	viaOutbox := newConfirmReactionFixture(t)
@@ -552,6 +554,7 @@ func TestConfirmReactionAndGoogleSnapshotCountTheReactionOnce(t *testing.T) {
 // both been stored, in either order and whatever the reaction and the earlier
 // snapshots were, the active reactions are exactly that frame's snapshot.
 func TestConfirmReactionAndGoogleSnapshotSettleOnThePhonesCopy(t *testing.T) {
+	racetest.SkipSequential(t)
 	f := newConfirmReactionFixture(t)
 	ctx := context.Background()
 	emoji := []string{"👍", "❤️"}

@@ -22,6 +22,7 @@ import (
 	"testing/quick"
 	"time"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/rs/zerolog"
 )
 
@@ -628,6 +629,7 @@ func TestRunPairQRGuidanceHasNoSideEffects(t *testing.T) {
 }
 
 func TestRunPairQRGuidancePreservesAnyExistingSession(t *testing.T) {
+	racetest.SkipSequential(t)
 	dataDir := t.TempDir()
 	t.Setenv("OPENMESSAGES_DATA_DIR", dataDir)
 	sessionPath := filepath.Join(dataDir, "session.json")

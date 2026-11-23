@@ -16,6 +16,7 @@ import (
 	"github.com/rs/zerolog"
 
 	"github.com/maxghenis/openmessage/internal/db"
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 func TestParseAttachmentDownloadFailuresReadsBothSignalCLIFormats(t *testing.T) {
@@ -79,6 +80,7 @@ func TestParseAttachmentDownloadFailuresBoundsTheCause(t *testing.T) {
 // processReceiveLine through a separate scan of the output, so the parser
 // cannot drop them.)
 func TestParseAttachmentDownloadFailuresProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	fragments := []string{
 		"java.io.IOException: boom",
 		"\tat a.b.C.d(C.java:1)",
@@ -169,6 +171,7 @@ func TestAttachmentDownloadFailuresMatchEnvelopeAttachmentIDs(t *testing.T) {
 // Property: a failure for remote id R belongs to attachment id A exactly when
 // A is R or R.<ext>; a different remote id that shares a prefix never matches.
 func TestAttachmentDownloadFailureMatchingProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(rawRemote, rawOther string, ext uint8) bool {
 		remote := sanitizeSignalAttachmentID("r" + rawRemote)
 		other := sanitizeSignalAttachmentID("o" + rawOther)

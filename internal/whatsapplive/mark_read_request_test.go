@@ -12,6 +12,7 @@ import (
 	"testing/quick"
 	"time"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"go.mau.fi/whatsmeow"
 	watypes "go.mau.fi/whatsmeow/types"
 )
@@ -579,6 +580,7 @@ func TestMarkReadRequestRefusesAGroupSenderThatIsNotAJIDOrNumber(t *testing.T) {
 // known, and as the phone number otherwise, after exactly one addressing
 // lookup.
 func TestMarkReadRequestGroupParticipantProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	type input struct {
 		Phone     uint64
 		LID       uint64

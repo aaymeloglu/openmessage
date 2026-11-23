@@ -14,6 +14,7 @@ import (
 	"testing/quick"
 	"time"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/rs/zerolog"
 )
 
@@ -105,6 +106,7 @@ func referenceDrainKill(policy receiveDrainPolicy, looks []drainLook, k int) boo
 }
 
 func TestDrainClockMatchesItsSpecificationProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(h drainHistory) bool {
 		clock := drainClock{policy: h.Policy, stoppedAt: testDrainStart}
 		for k, look := range h.Looks {
@@ -143,6 +145,7 @@ func TestDrainClockMatchesItsSpecificationProperty(t *testing.T) {
 // Without downloads or a caller stop, the drain is the fixed grace every
 // call had: killed exactly once idle has passed since the stop.
 func TestDrainClockWithoutDownloadsIsTheFixedGraceProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(h drainHistory) bool {
 		clock := drainClock{policy: h.Policy, stoppedAt: testDrainStart}
 		for _, look := range h.Looks {

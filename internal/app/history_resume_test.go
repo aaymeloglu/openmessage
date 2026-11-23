@@ -13,6 +13,7 @@ import (
 	"go.mau.fi/mautrix-gmessages/pkg/libgm/gmproto"
 
 	"github.com/maxghenis/openmessage/internal/db"
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // Second-round review of PR #200: what a catch-up leaves behind when it stops
@@ -181,6 +182,7 @@ func (reconcileCase) Generate(r *rand.Rand, _ int) reflect.Value {
 // millisecond, across pages and with the boundary: storing them oldest first
 // then relies on reversing the page order before the stable sort.
 func TestHistoryReconcilePropertyStopLeavesNoHole(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c reconcileCase) bool {
 		total := c.Newer + 1
 		all := make([]*gmproto.Message, 0, total) // newest first

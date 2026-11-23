@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"testing/quick"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // signalCLINoiseLines are log lines of the shapes signal-cli writes to stderr.
@@ -88,6 +90,7 @@ func (o accountProbeOutput) want() []string {
 // noisy buffer parses to exactly the accounts the clean payload names (sorted,
 // de-duplicated), and agrees with parsing the payload alone.
 func TestParseSignalAccountsIgnoresNoiseAroundPayloadProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(o accountProbeOutput) bool {
 		got := parseSignalAccounts(o.buffer())
 		clean := parseSignalAccounts([]byte(o.Payload))
@@ -101,6 +104,7 @@ func TestParseSignalAccountsIgnoresNoiseAroundPayloadProperty(t *testing.T) {
 // Invariant: noise alone names no account, including the addresses some
 // signal-cli warnings mention in prose.
 func TestParseSignalAccountsFindsNothingInNoiseOnlyProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(o accountProbeOutput) bool {
 		lines := append(slices.Clone(o.Before), o.After...)
 		return len(parseSignalAccounts([]byte(strings.Join(lines, "\n")))) == 0

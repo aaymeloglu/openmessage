@@ -27,6 +27,7 @@ import (
 	"github.com/maxghenis/openmessage/internal/freshness"
 	"github.com/maxghenis/openmessage/internal/ingest"
 	"github.com/maxghenis/openmessage/internal/localapi"
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"github.com/maxghenis/openmessage/internal/storage/sqlite"
 	"github.com/maxghenis/openmessage/internal/v2read"
 	"github.com/maxghenis/openmessage/internal/web"
@@ -756,6 +757,7 @@ func (s stubStatusActivity) Between(_ context.Context, platform string, from, to
 // the verdict judged without one, marked baseline_unavailable. A platform
 // with no activity gets no verdict.
 func TestJudgeSilenceLocallyIsEvaluateSilence(t *testing.T) {
+	racetest.SkipSequential(t)
 	zones := []string{"UTC", "America/New_York", "Asia/Kolkata", "Australia/Lord_Howe"}
 	start := time.Date(2026, 3, 1, 0, 0, 0, 0, time.UTC)
 	property := func(seed int64) bool {

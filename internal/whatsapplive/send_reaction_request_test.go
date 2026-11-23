@@ -11,6 +11,7 @@ import (
 	"testing"
 	"testing/quick"
 
+	"github.com/maxghenis/openmessage/internal/racetest"
 	"go.mau.fi/whatsmeow"
 	waE2E "go.mau.fi/whatsmeow/proto/waE2E"
 	wastore "go.mau.fi/whatsmeow/store"
@@ -505,6 +506,7 @@ func TestSendReactionRequestRefusesAGroupSenderThatIsNotAJIDOrNumber(t *testing.
 // exactly when the group addresses members by LID and the LID is known, and as
 // the phone number otherwise.
 func TestSendReactionRequestGroupParticipantProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	type input struct {
 		Phone     uint64
 		LID       uint64

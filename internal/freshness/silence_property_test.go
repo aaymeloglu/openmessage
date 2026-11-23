@@ -8,6 +8,8 @@ import (
 	"testing/quick"
 	"time"
 	_ "time/tzdata" // the zones below must resolve on any CI image
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // Zones chosen for awkward clocks: DST in both hemispheres, half-hour and
@@ -107,6 +109,7 @@ func checkProperty(t *testing.T, name string, property any) {
 // exceeds the silent hours, active days never exceed the window, and silence
 // is never negative.
 func TestSilencePropertyBounds(t *testing.T) {
+	racetest.SkipSequential(t)
 	checkProperty(t, "bounds", func(c silenceCase) bool {
 		from, to := BaselineRange(c.Last, c.Loc, c.Cfg)
 		profile := BuildProfile(c.Baseline, from, to, c.Loc)
@@ -139,6 +142,7 @@ func TestSilencePropertyBounds(t *testing.T) {
 // needs only the silence. Conversely, the length rules always fire once their
 // preconditions hold, so no platform can stay fresh forever.
 func TestSilencePropertyRulesFireExactlyOnTheirPreconditions(t *testing.T) {
+	racetest.SkipSequential(t)
 	checkProperty(t, "rule preconditions", func(c silenceCase) bool {
 		v := EvaluateSilence(c.Last, c.Baseline, c.Now, c.Loc, c.Cfg)
 		busy := v.BaselineActiveDays > 0 && v.BaselineActiveDays >= c.Cfg.MinBusyDays &&
@@ -180,6 +184,7 @@ func TestSilencePropertyRulesFireExactlyOnTheirPreconditions(t *testing.T) {
 // Monotone in time: with no new event, more silence never lowers the score
 // and never clears a stall.
 func TestSilencePropertyMonotoneInNow(t *testing.T) {
+	racetest.SkipSequential(t)
 	checkProperty(t, "monotone", func(c silenceCase, extraMinutes uint16) bool {
 		later := c.Now.Add(time.Duration(extraMinutes) * time.Minute)
 		a := EvaluateSilence(c.Last, c.Baseline, c.Now, c.Loc, c.Cfg)
@@ -190,6 +195,7 @@ func TestSilencePropertyMonotoneInNow(t *testing.T) {
 
 // The score is an integral, so it splits at any midpoint.
 func TestSilencePropertyExpectedHoursAdditive(t *testing.T) {
+	racetest.SkipSequential(t)
 	checkProperty(t, "additive", func(c silenceCase, split uint16) bool {
 		from, to := BaselineRange(c.Last, c.Loc, c.Cfg)
 		profile := BuildProfile(c.Baseline, from, to, c.Loc)
@@ -204,6 +210,7 @@ func TestSilencePropertyExpectedHoursAdditive(t *testing.T) {
 // Determinism: baseline order and events outside the baseline window do not
 // change the verdict.
 func TestSilencePropertyIgnoresOrderAndOutOfWindowEvents(t *testing.T) {
+	racetest.SkipSequential(t)
 	checkProperty(t, "order and window", func(c silenceCase, seed int64) bool {
 		r := rand.New(rand.NewSource(seed))
 		shuffled := append([]time.Time(nil), c.Baseline...)
@@ -223,6 +230,7 @@ func TestSilencePropertyIgnoresOrderAndOutOfWindowEvents(t *testing.T) {
 
 // A fresh event, or a clock reading before the last event, is never a stall.
 func TestSilencePropertyNoSilenceNoStall(t *testing.T) {
+	racetest.SkipSequential(t)
 	checkProperty(t, "fresh", func(c silenceCase, skewMinutes uint16) bool {
 		for _, now := range []time.Time{c.Last, c.Last.Add(-time.Duration(skewMinutes) * time.Minute)} {
 			v := EvaluateSilence(c.Last, c.Baseline, now, c.Loc, c.Cfg)
@@ -238,6 +246,7 @@ func TestSilencePropertyNoSilenceNoStall(t *testing.T) {
 // nothing but the reported last event. The shift stays within ten years:
 // Kolkata's offset has been +05:30 since 1945 but was not before.
 func TestSilencePropertyWholeDayShiftInvariant(t *testing.T) {
+	racetest.SkipSequential(t)
 	checkProperty(t, "day shift", func(c silenceCase, days int16) bool {
 		if c.Loc.String() != "UTC" && c.Loc.String() != "Asia/Kolkata" {
 			return true

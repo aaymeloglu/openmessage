@@ -13,6 +13,8 @@ import (
 	"testing"
 	"testing/quick"
 	"time"
+
+	"github.com/maxghenis/openmessage/internal/racetest"
 )
 
 // The rewrites in the 2026-10-09 plan audit change how SQLite reaches rows,
@@ -323,6 +325,7 @@ var readPlanQuickConfig = &quick.Config{MaxCount: 30}
 // OR-form cursor, in the same order, for every cursor and limit; and paging a
 // conversation with it visits every message once, newest first.
 func TestKeysetCursorMatchesORFormProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c readPlanStore) bool {
 		s := seedReadStore(t, c.Seed)
 		r := rand.New(rand.NewSource(c.Seed ^ 0x5eed))
@@ -396,6 +399,7 @@ func TestKeysetCursorMatchesORFormProperty(t *testing.T) {
 // Invariant: for every filter combination, the audited search statement
 // returns the same messages, in the same order, as the statement it replaced.
 func TestSearchStatementMatchesPreviousStatementProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c readPlanStore) bool {
 		s := seedReadStore(t, c.Seed)
 		r := rand.New(rand.NewSource(c.Seed ^ 0x5ea7c4))
@@ -437,6 +441,7 @@ func TestSearchStatementMatchesPreviousStatementProperty(t *testing.T) {
 // Invariant: the rebind lookups return what the replaced statements and the
 // replaced group scan returned, for every account, identity and peer set.
 func TestRebindLookupsMatchPreviousQueriesProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c readPlanStore) bool {
 		s := seedReadStore(t, c.Seed)
 		r := rand.New(rand.NewSource(c.Seed ^ 0x2eb1d))
@@ -567,6 +572,7 @@ func previousGroupByPeerSet(t *testing.T, db *sql.DB, account string, identityID
 // Invariant: the one-statement recency list equals sorting every conversation
 // of every account (archived ones included) and keeping the first limit.
 func TestConversationsByRecencyMatchesFullSortProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c readPlanStore) bool {
 		s := seedReadStore(t, c.Seed)
 		// Every conversation row, read whole, sorted in Go: the reference
@@ -605,6 +611,7 @@ func TestConversationsByRecencyMatchesFullSortProperty(t *testing.T) {
 // MessageHasReadCursor agrees with counting cursors directly, and the outbox
 // state lookup returns the newest row by (created_at_ms, outbox_id).
 func TestAccountAggregatesAndLookupsMatchReferenceProperty(t *testing.T) {
+	racetest.SkipSequential(t)
 	property := func(c readPlanStore) bool {
 		s := seedReadStore(t, c.Seed)
 		for _, account := range append(slices.Clone(s.accounts), "account-none") {

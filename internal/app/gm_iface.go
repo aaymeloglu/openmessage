@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+
 	"go.mau.fi/mautrix-gmessages/pkg/libgm"
 	"go.mau.fi/mautrix-gmessages/pkg/libgm/gmproto"
 )

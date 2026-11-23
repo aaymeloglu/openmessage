@@ -438,3 +438,15 @@ func TestConfigureServeEnvRestoresPreviousValue(t *testing.T) {
 		t.Fatalf("OPENMESSAGES_DEMO=%q, want existing after restore", got)
 	}
 }
+
+func TestCanRefreshGoogleCookiesDisabledByEnv(t *testing.T) {
+	t.Setenv("OPENMESSAGE_COOKIE_REFRESH_SCRIPT", "/bin/true")
+	t.Setenv("OPENMESSAGE_DISABLE_COOKIE_REFRESH", "1")
+	if canRefreshGoogleCookies() {
+		t.Fatal("refresh should be disabled when OPENMESSAGE_DISABLE_COOKIE_REFRESH=1")
+	}
+	t.Setenv("OPENMESSAGE_DISABLE_COOKIE_REFRESH", "0")
+	if !canRefreshGoogleCookies() {
+		t.Fatal("OPENMESSAGE_DISABLE_COOKIE_REFRESH=0 should leave refresh on")
+	}
+}

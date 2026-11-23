@@ -1118,6 +1118,13 @@ const googleCookieRefreshTimeout = 20 * time.Second
 // available, the adapter classifies auth expiry as a blocked condition and the
 // existing needs_repair status prompts a manual re-pair instead of spinning.
 func canRefreshGoogleCookies() bool {
+	// OPENMESSAGE_DISABLE_COOKIE_REFRESH turns auto-repair off entirely, for a
+	// session paired from its own dedicated Google sign-in: libgm keeps those
+	// cookies rotated itself, and the native refresh would read the browser's
+	// Safe Storage key from the keychain (a password prompt on every retry).
+	if v := strings.TrimSpace(os.Getenv("OPENMESSAGE_DISABLE_COOKIE_REFRESH")); v != "" && v != "0" {
+		return false
+	}
 	if strings.TrimSpace(os.Getenv("OPENMESSAGE_COOKIE_REFRESH_SCRIPT")) != "" {
 		return true
 	}

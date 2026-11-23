@@ -1,11 +1,9 @@
 package app
 
 import (
-	"errors"
 	"sync"
 	"time"
 
-	"go.mau.fi/mautrix-gmessages/pkg/libgm"
 	"go.mau.fi/mautrix-gmessages/pkg/libgm/gmproto"
 )
 
@@ -130,14 +128,14 @@ func (a *App) GooglePullHealth() *GooglePullHealthSnapshot {
 // answered with its Google-account switch notice instead of data (the phone
 // switched to Google-account pairing; this session is a QR pairing).
 func IsGoogleAccountSwitchError(err error) bool {
-	var payloadErr *libgm.ResponsePayloadError
-	return errors.As(err, &payloadErr) && payloadErr.AccountSwitch
+	// Upstream libgm (v0.2611) has no ResponsePayloadError; the account-switch
+	// notice surfaces as an ordinary error there.
+	_ = err
+	return false
 }
 
 func classifyGooglePull(count int, err error) GooglePullOutcome {
 	switch {
-	case errors.Is(err, libgm.ErrNoResponsePayload):
-		return GooglePullNoPayload
 	case err != nil:
 		return GooglePullError
 	case count == 0:
